@@ -25,6 +25,7 @@ const router = express.Router();
    LIST ALL JOBS — GET /api/jobs
    ══════════════════════════════════════════════════════════════════════════ */
 router.get('/', async (req, res) => {
+    res.set('Cache-Control', 'no-store'); // ✅ correct place
   try {
     const s3     = new S3Client({ region: process.env.AWS_REGION || 'ap-south-1' });
     const BUCKET = process.env.S3_BUCKET_NAME;
@@ -73,8 +74,20 @@ router.get('/', async (req, res) => {
       const slice   = ids.slice(i, i + BATCH);
       const settled = await Promise.allSettled(
         slice.map(async (jobId) => {
-          const metadata = await getJsonFromS3(`jobs/${jobId}/metadata.json`);
+let metadata;
 
+try {
+  metadata = await getJsonFromS3(`jobs/${jobId}/metadata.json`);
+  console.log("[Jobs] Loaded metadata for:", jobId);
+} catch (err) {
+  console.error("[Jobs] FAILED metadata for:", jobId, err.message);
+
+  return {
+    id: jobId,
+    status: "error",
+    createdAt: null,
+  };
+}
           try {
             const queue = await getJsonFromS3(`jobs/${jobId}/processing/queue.json`);
 

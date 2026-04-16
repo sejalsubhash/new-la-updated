@@ -188,12 +188,24 @@ export async function getFromS3(key) {
 }
 
 export async function getJsonFromS3(key) {
-  const response = await s3Client.send(new GetObjectCommand({
-    Bucket: BUCKET,
-    Key: key
-  }));
-  const str = await response.Body.transformToString();
-  return JSON.parse(str);
+  try {
+    const response = await s3Client.send(new GetObjectCommand({
+      Bucket: BUCKET,
+      Key: key
+    }));
+
+    // ✅ Use your existing safe stream reader
+    const buffer = await streamToBuffer(response.Body);
+    const str = buffer.toString('utf-8');
+
+    console.log(`[S3] Successfully read: ${key}`);
+
+    return JSON.parse(str);
+
+  } catch (err) {
+    console.error(`[S3] ERROR reading ${key}:`, err.message);
+    throw err;
+  }
 }
 
 export async function putJsonToS3(key, data) {
