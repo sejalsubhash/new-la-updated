@@ -109,7 +109,7 @@ function parseJsonResponse(text) {
   }
 }
 
-async function callBedrock(content, mediaType, systemPrompt, retries = 3) {
+async function callBedrock(content, mediaType, systemPrompt, retries = 6) {
   let messageContent;
   if (mediaType === 'pdf') {
     messageContent = [
