@@ -11,7 +11,7 @@ import { getFromS3, uploadToS3, getJsonFromS3, putJsonToS3 } from '../services/s
 import { generateAuditReport } from '../services/excelService.js';
 
 /* ── CONSTANTS ── */
-const CONCURRENCY     = 10;            // Reduced from 50 — stays well under 50 RPM Bedrock quota
+const CONCURRENCY     = 30;            // Reduced from 50 — stays well under 50 RPM Bedrock quota
 const MAX_DIRECT_SIZE = 10 * 1024 * 1024;
 const TEXT_CHUNK_SIZE = 40000;
 const MAX_PAGES_BATCH = 5;
